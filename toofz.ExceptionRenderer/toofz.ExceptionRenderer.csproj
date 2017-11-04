@@ -3,11 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Version>1.0.0</Version>
+    <PackageVersion>1.0.0</PackageVersion>
     <Authors>Leonard Thieu</Authors>
+    <Title>toofz Exception Renderer</Title>
+    <Description>An exception renderer for log4net that formats Exceptions for readability.</Description>
+    <Copyright>Copyright © Leonard Thieu 2017</Copyright>
     <PackageLicenseUrl>https://github.com/leonard-thieu/toofz-exception-renderer/blob/d90c5ade9d45a2cbd918089145b022c46f66a301/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/leonard-thieu/toofz-exception-renderer</PackageProjectUrl>
     <PackageIconUrl>https://user-images.githubusercontent.com/5265970/29717713-27e1a95c-897e-11e7-9d28-dae64be705b5.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/leonard-thieu/toofz-exception-renderer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
