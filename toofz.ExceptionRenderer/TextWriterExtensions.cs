@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace toofz
 {
@@ -14,14 +13,8 @@ namespace toofz
         /// </summary>
         /// <param name="writer">The text writer.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="writer"/> is null.
-        /// </exception>
         public static void WriteLineStart(this TextWriter writer, object value)
         {
-            if (writer == null)
-                throw new ArgumentNullException(nameof(writer));
-
             writer.WriteLine();
             writer.Write(value);
         }
