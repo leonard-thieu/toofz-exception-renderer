@@ -13,9 +13,10 @@ namespace toofz.Tests
             {
                 // Arrange
                 var mockWriter = new Mock<TextWriter>();
+                var writer = mockWriter.Object;
 
                 // Act
-                TextWriterExtensions.WriteLineStart(mockWriter.Object, null);
+                writer.WriteLineStart(null);
 
                 // Assert
                 mockWriter.Verify(x => x.WriteLine(), Times.Once);

@@ -2,6 +2,7 @@
 using System.CodeDom.Compiler;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using log4net;
 using log4net.ObjectRenderer;
 
@@ -14,17 +15,40 @@ namespace toofz
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ExceptionRenderer));
 
-        /// <summary>
-        /// Renders an object of type <see cref="Exception"/> similar to how Visual Studio Exception Assistant 
-        /// renders it.
-        /// </summary>
-        /// <param name="rendererMap">Not used.</param>
-        /// <param name="exception">The exception.</param>
-        /// <param name="writer">The writer.</param>
-        public void RenderObject(RendererMap rendererMap, object exception, TextWriter writer)
+        internal static Exception FlattenException(Exception ex)
         {
-            RenderObject(rendererMap, exception, writer, suppressFileInfo: false);
+            var aggr = ex as AggregateException;
+            if (aggr != null)
+            {
+                var flattened = aggr.Flatten();
+                ex = flattened.InnerExceptions.Count == 1 ?
+                    flattened.InnerException :
+                    flattened;
+            }
+
+            return ex;
         }
+
+        /// <summary>
+        /// Initializes an instance of the <see cref="ExceptionRenderer"/> class.
+        /// </summary>
+        public ExceptionRenderer() : this(null, suppressFileInfo: false) { }
+
+        /// <summary>
+        /// Initializes an instance of the <see cref="ExceptionRenderer"/> class.
+        /// </summary>
+        /// <param name="log">Logger</param>
+        /// <param name="suppressFileInfo">
+        /// Suppresses file information in stack traces. This is used for repeatable tests.
+        /// </param>
+        internal ExceptionRenderer(ILog log, bool suppressFileInfo)
+        {
+            this.log = log ?? Log;
+            this.suppressFileInfo = suppressFileInfo;
+        }
+
+        private readonly ILog log;
+        private readonly bool suppressFileInfo;
 
         /// <summary>
         /// Renders an object of type <see cref="Exception"/> similar to how Visual Studio Exception Assistant 
@@ -33,10 +57,7 @@ namespace toofz
         /// <param name="rendererMap">Not used.</param>
         /// <param name="exception">The exception.</param>
         /// <param name="writer">The writer.</param>
-        /// <param name="suppressFileInfo">
-        /// Suppresses file information in stack traces. This is used for repeatable tests.
-        /// </param>
-        internal void RenderObject(RendererMap rendererMap, object exception, TextWriter writer, bool suppressFileInfo)
+        public void RenderObject(RendererMap rendererMap, object exception, TextWriter writer)
         {
             var ex = (Exception)exception;
             var type = ex.GetType();
@@ -67,16 +88,17 @@ namespace toofz
                         break;
 
                     default:
-                        var value = property.GetValue(ex)?.ToString();
+                        var value = property.GetValue(ex);
                         if (value != null)
                         {
-                            indentedWriter.WriteLineStart($"{name}={value}");
+                            indentedWriter.WriteLineStart($"{name}=");
+                            rendererMap.FindAndRender(value, indentedWriter);
                         }
                         break;
                 }
             }
 
-            RenderStackTrace(ex.StackTrace, indentedWriter, suppressFileInfo);
+            RenderStackTrace(ex.StackTrace, indentedWriter);
 
             var innerException = ex.InnerException;
             if (innerException != null)
@@ -84,37 +106,19 @@ namespace toofz
                 type = innerException.GetType();
                 indentedWriter.WriteLineStart($"{nameof(Exception.InnerException)}: {type}");
                 indentedWriter.Indent++;
-                RenderObject(rendererMap, innerException, indentedWriter, suppressFileInfo);
+                RenderObject(rendererMap, innerException, indentedWriter);
             }
         }
 
-        internal static Exception FlattenException(Exception ex)
-        {
-            var aggr = ex as AggregateException;
-            if (aggr != null)
-            {
-                var flattened = aggr.Flatten();
-                ex = flattened.InnerExceptions.Count == 1 ?
-                    flattened.InnerException :
-                    flattened;
-            }
-
-            return ex;
-        }
-
-        internal static void RenderStackTrace(
+        internal void RenderStackTrace(
             string stackTrace,
-            IndentedTextWriter indentedWriter,
-            bool suppressFileInfo = false,
-            ILog log = null)
+            IndentedTextWriter indentedWriter)
         {
             stackTrace = stackTrace ?? "";
-            log = log ?? Log;
 
             var stackFrames = stackTrace.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (stackFrames.Length == 0)
-                return;
+            if (stackFrames.Length == 0) { return; }
 
             indentedWriter.WriteLineStart("StackTrace:");
             indentedWriter.Indent++;
@@ -123,22 +127,25 @@ namespace toofz
             {
                 if (stackFrame.StartsWith("   at "))
                 {
-                    var trimmedStackFrame = stackFrame.Remove(0, 6);
+                    var trimmedStackFrame = stackFrame.Substring(6);
                     // Stack frames from the following namespaces are generally internals for handling async methods. 
                     // Filtering them out reduces noise when rendering stack traces.
-                    if (!(trimmedStackFrame.StartsWith("System.Runtime.CompilerServices") ||
-                          trimmedStackFrame.StartsWith("System.Runtime.ExceptionServices")))
+                    if (trimmedStackFrame.StartsWith("System.Runtime.CompilerServices")) { continue; }
+                    if (trimmedStackFrame.StartsWith("System.Runtime.ExceptionServices")) { continue; }
+
+                    if (suppressFileInfo)
                     {
-                        if (suppressFileInfo)
+                        var inIndex = trimmedStackFrame.IndexOf(" in ");
+                        if (inIndex > -1)
                         {
-                            var inIndex = trimmedStackFrame.IndexOf(" in ");
-                            if (inIndex > -1)
-                            {
-                                trimmedStackFrame = trimmedStackFrame.Substring(0, inIndex);
-                            }
+                            trimmedStackFrame = trimmedStackFrame.Remove(inIndex);
                         }
-                        indentedWriter.WriteLineStart(trimmedStackFrame);
                     }
+
+                    var regex = new Regex(@"<(\w+)>\w__\d+(?:`\d+)?\.MoveNext\(\)", RegexOptions.None, TimeSpan.FromSeconds(5));
+                    trimmedStackFrame = regex.Replace(trimmedStackFrame, "$1()");
+
+                    indentedWriter.WriteLineStart(trimmedStackFrame);
                 }
                 else if (stackFrame.StartsWith("---"))
                 {

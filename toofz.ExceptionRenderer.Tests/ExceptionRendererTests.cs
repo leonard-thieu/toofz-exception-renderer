@@ -2,6 +2,7 @@
 using System.CodeDom.Compiler;
 using System.IO;
 using log4net;
+using log4net.ObjectRenderer;
 using Moq;
 using Xunit;
 
@@ -9,64 +10,6 @@ namespace toofz.Tests
 {
     public class ExceptionRendererTests
     {
-        public class RenderObjectMethod
-        {
-            [Fact]
-            public void RendersException()
-            {
-                // Arrange
-                var ex = ExceptionHelper.GetThrownException();
-                var renderer = new ExceptionRenderer();
-                using (var sr = new StringWriter())
-                {
-                    // Act
-                    renderer.RenderObject(null, ex, sr, true);
-                    var output = sr.ToString();
-
-                    // Assert
-                    var expected = @"System.Exception was unhandled
-  HResult=-2146233088
-  Message=Thrown test exception
-  Source=toofz.ExceptionRenderer.Tests
-  StackTrace:
-    toofz.Tests.ExceptionHelper.ThrowException()
-    toofz.Tests.ExceptionHelper.GetThrownException()";
-                    Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
-                }
-            }
-
-            [Fact]
-            public void ExceptionHasInnerException_RendersExceptionRecursively()
-            {
-                // Arrange
-                var ex = ExceptionHelper.GetThrownExceptionWithInnerException();
-                var renderer = new ExceptionRenderer();
-                using (var sr = new StringWriter())
-                {
-                    // Act
-                    renderer.RenderObject(null, ex, sr, true);
-                    var output = sr.ToString();
-
-                    // Assert
-                    var expected = @"System.Exception was unhandled
-  HResult=-2146233088
-  Message=Thrown test exception with inner exception
-  Source=toofz.ExceptionRenderer.Tests
-  StackTrace:
-    toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()
-    toofz.Tests.ExceptionHelper.GetThrownExceptionWithInnerException()
-  InnerException: System.Exception
-    HResult=-2146233088
-    Message=Thrown test exception
-    Source=toofz.ExceptionRenderer.Tests
-    StackTrace:
-      toofz.Tests.ExceptionHelper.ThrowException()
-      toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()";
-                    Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
-                }
-            }
-        }
-
         public class FlattenExceptionMethod
         {
             [Fact]
@@ -114,18 +57,79 @@ namespace toofz.Tests
             }
         }
 
+        public class RenderObjectMethod
+        {
+            [Fact]
+            public void RendersException()
+            {
+                // Arrange
+                var rendererMap = new RendererMap();
+                var ex = ExceptionHelper.GetThrownException();
+                var renderer = new ExceptionRenderer(null, suppressFileInfo: true);
+                using (var sr = new StringWriter())
+                {
+                    // Act
+                    renderer.RenderObject(rendererMap, ex, sr);
+                    var output = sr.ToString();
+
+                    // Assert
+                    var expected = @"System.Exception was unhandled
+  HResult=-2146233088
+  Message=Thrown test exception
+  Source=toofz.ExceptionRenderer.Tests
+  StackTrace:
+    toofz.Tests.ExceptionHelper.ThrowException()
+    toofz.Tests.ExceptionHelper.GetThrownException()";
+                    Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
+                }
+            }
+
+            [Fact]
+            public void ExceptionHasInnerException_RendersExceptionRecursively()
+            {
+                // Arrange
+                var rendererMap = new RendererMap();
+                var ex = ExceptionHelper.GetThrownExceptionWithInnerException();
+                var renderer = new ExceptionRenderer(null, suppressFileInfo: true);
+                using (var sr = new StringWriter())
+                {
+                    // Act
+                    renderer.RenderObject(rendererMap, ex, sr);
+                    var output = sr.ToString();
+
+                    // Assert
+                    var expected = @"System.Exception was unhandled
+  HResult=-2146233088
+  Message=Thrown test exception with inner exception
+  Source=toofz.ExceptionRenderer.Tests
+  StackTrace:
+    toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()
+    toofz.Tests.ExceptionHelper.GetThrownExceptionWithInnerException()
+  InnerException: System.Exception
+    HResult=-2146233088
+    Message=Thrown test exception
+    Source=toofz.ExceptionRenderer.Tests
+    StackTrace:
+      toofz.Tests.ExceptionHelper.ThrowException()
+      toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()";
+                    Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
+                }
+            }
+        }
+
         public class RenderStackTraceMethod
         {
             [Fact]
             public void StackTraceIsNull_DoesNotThrowNullReferenceException()
             {
                 // Arrange
+                var renderer = new ExceptionRenderer();
                 string stackTrace = null;
                 using (var sw = new StringWriter())
                 using (var indentedTextWriter = new IndentedTextWriter(sw))
                 {
                     // Act -> Assert
-                    ExceptionRenderer.RenderStackTrace(stackTrace, indentedTextWriter);
+                    renderer.RenderStackTrace(stackTrace, indentedTextWriter);
                 }
             }
 
@@ -133,12 +137,13 @@ namespace toofz.Tests
             public void StackTraceIsEmpty_DoesNotRenderStackTrace()
             {
                 // Arrange
+                var renderer = new ExceptionRenderer();
                 string stackTrace = "";
                 using (var sw = new StringWriter())
                 using (var indentedTextWriter = new IndentedTextWriter(sw))
                 {
                     // Act
-                    ExceptionRenderer.RenderStackTrace(stackTrace, indentedTextWriter);
+                    renderer.RenderStackTrace(stackTrace, indentedTextWriter);
 
                     // Assert
                     Assert.Equal("", sw.ToString());
@@ -146,15 +151,16 @@ namespace toofz.Tests
             }
 
             [Fact]
-            public void StackTraceFromThrownException_RendersStackTraceCorrectly()
+            public void ThrownException_RendersStackTrace()
             {
                 // Arrange
+                var renderer = new ExceptionRenderer(null, suppressFileInfo: true);
                 var ex = ExceptionHelper.GetThrownException();
                 using (var sw = new StringWriter())
                 using (var indentedTextWriter = new IndentedTextWriter(sw))
                 {
                     // Act
-                    ExceptionRenderer.RenderStackTrace(ex.StackTrace, indentedTextWriter, true);
+                    renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
 
                     // Assert
@@ -167,9 +173,10 @@ StackTrace:
             }
 
             [Fact]
-            public void StackTraceFromUnthrownException_RendersStackTraceCorrectly()
+            public void UnthrownException_RendersStackTrace()
             {
                 // Arrange
+                var renderer = new ExceptionRenderer(null, suppressFileInfo: true);
                 var stackTraceStr = @"   at toofz.Tests.ExceptionHelper.ThrowException() in S:\Projects\toofz\toofz.Tests\ExceptionHelper.cs:line 10
    at toofz.TestsShared.Record.Exception(Action testCode) in C:\projects\toofz-testsshared\toofz.TestsShared\Record.cs:line 33";
                 var ex = new UnthrownException(stackTraceStr);
@@ -177,7 +184,7 @@ StackTrace:
                 using (var indentedTextWriter = new IndentedTextWriter(sw))
                 {
                     // Act
-                    ExceptionRenderer.RenderStackTrace(ex.StackTrace, indentedTextWriter, true);
+                    renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
 
                     // Assert
@@ -190,21 +197,46 @@ StackTrace:
             }
 
             [Fact]
-            public void StackFrameStartsWith3Dashes_DoesNotLogWarning()
+            public void RendersAsyncStackFrame()
             {
                 // Arrange
-                var stackTraceStr = "---";
-                var ex = new UnthrownException(stackTraceStr);
-                var mockLog = new Mock<ILog>();
+                var renderer = new ExceptionRenderer(null, suppressFileInfo: true);
+                var ex = ExceptionHelper.GetThrownExceptionAsync();
                 using (var sw = new StringWriter())
                 using (var indentedTextWriter = new IndentedTextWriter(sw))
                 {
                     // Act
-                    ExceptionRenderer.RenderStackTrace(ex.StackTrace, indentedTextWriter, true, mockLog.Object);
+                    renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
 
                     // Assert
-                    mockLog.Verify(log => log.Warn(It.IsAny<object>()), Times.Never);
+                    Assert.Equal(@"
+StackTrace:
+    toofz.Tests.ExceptionHelper.ThrowException()
+    toofz.Tests.ExceptionHelper.GetThrownException()
+    toofz.Tests.ExceptionHelper.ThrowsExceptionAsync()
+    toofz.Tests.ExceptionHelper.GetThrownExceptionAsync()", output, ignoreLineEndingDifferences: true);
+                }
+            }
+
+            [Fact]
+            public void StackFrameStartsWith3Dashes_DoesNotLogWarning()
+            {
+                // Arrange
+                var mockLog = new Mock<ILog>();
+                var log = mockLog.Object;
+                var renderer = new ExceptionRenderer(log, suppressFileInfo: true);
+                var stackTraceStr = "---";
+                var ex = new UnthrownException(stackTraceStr);
+                using (var sw = new StringWriter())
+                using (var indentedTextWriter = new IndentedTextWriter(sw))
+                {
+                    // Act
+                    renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
+                    var output = sw.ToString();
+
+                    // Assert
+                    mockLog.Verify(l => l.Warn(It.IsAny<object>()), Times.Never);
                 }
             }
 
@@ -212,18 +244,20 @@ StackTrace:
             public void StackFrameInWrongFormat_LogsWarning()
             {
                 // Arrange
+                var mockLog = new Mock<ILog>();
+                var log = mockLog.Object;
+                var renderer = new ExceptionRenderer(log, suppressFileInfo: true);
                 var stackTraceStr = "?";
                 var ex = new UnthrownException(stackTraceStr);
-                var mockLog = new Mock<ILog>();
                 using (var sw = new StringWriter())
                 using (var indentedTextWriter = new IndentedTextWriter(sw))
                 {
                     // Act
-                    ExceptionRenderer.RenderStackTrace(ex.StackTrace, indentedTextWriter, true, mockLog.Object);
+                    renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
 
                     // Assert
-                    mockLog.Verify(log => log.Warn(It.IsAny<object>()), Times.Once);
+                    mockLog.Verify(l => l.Warn(It.IsAny<object>()), Times.Once);
                 }
             }
         }

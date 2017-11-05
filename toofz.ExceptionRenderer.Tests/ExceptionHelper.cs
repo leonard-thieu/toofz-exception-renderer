@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace toofz.Tests
 {
@@ -43,6 +44,27 @@ namespace toofz.Tests
             try
             {
                 ThrowExceptionWithInnerException();
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+
+            // Unreachable
+            return null;
+        }
+
+        private static async Task ThrowsExceptionAsync()
+        {
+            var ex = GetThrownException();
+            await Task.FromException(ex);
+        }
+
+        public static Exception GetThrownExceptionAsync()
+        {
+            try
+            {
+                ThrowsExceptionAsync().GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
