@@ -23,7 +23,7 @@ namespace toofz
         /// <param name="writer">The writer.</param>
         public void RenderObject(RendererMap rendererMap, object exception, TextWriter writer)
         {
-            RenderObject(rendererMap, exception, writer, false);
+            RenderObject(rendererMap, exception, writer, suppressFileInfo: false);
         }
 
         /// <summary>
@@ -124,9 +124,10 @@ namespace toofz
                 if (stackFrame.StartsWith("   at "))
                 {
                     var trimmedStackFrame = stackFrame.Remove(0, 6);
-                    // Stack frames from System.Runtime.CompilerServices are generally internals for handling async methods. 
-                    // They produce a lot of noise in logs so we filter them out when rendering stack traces.
-                    if (!trimmedStackFrame.StartsWith("System.Runtime.CompilerServices"))
+                    // Stack frames from the following namespaces are generally internals for handling async methods. 
+                    // Filtering them out reduces noise when rendering stack traces.
+                    if (!(trimmedStackFrame.StartsWith("System.Runtime.CompilerServices") ||
+                          trimmedStackFrame.StartsWith("System.Runtime.ExceptionServices")))
                     {
                         if (suppressFileInfo)
                         {
