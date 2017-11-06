@@ -60,6 +60,32 @@ namespace toofz.Tests
         public class RenderObjectMethod
         {
             [Fact]
+            public void AggregateException_RendersFlattenedException()
+            {
+                // Arrange
+                var rendererMap = new RendererMap();
+                var inner = ExceptionHelper.GetThrownException();
+                var ex = new AggregateException(inner);
+                var renderer = new ExceptionRenderer(null, suppressFileInfo: true);
+                using (var sr = new StringWriter())
+                {
+                    // Act
+                    renderer.RenderObject(rendererMap, ex, sr);
+                    var output = sr.ToString();
+
+                    // Assert
+                    var expected = @"System.Exception was unhandled
+  HResult=-2146233088
+  Message=Thrown test exception
+  Source=toofz.ExceptionRenderer.Tests
+  StackTrace:
+    toofz.Tests.ExceptionHelper.ThrowException()
+    toofz.Tests.ExceptionHelper.GetThrownException()";
+                    Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
+                }
+            }
+
+            [Fact]
             public void RendersException()
             {
                 // Arrange

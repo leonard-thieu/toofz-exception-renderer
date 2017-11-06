@@ -59,7 +59,7 @@ namespace toofz
         /// <param name="writer">The writer.</param>
         public void RenderObject(RendererMap rendererMap, object exception, TextWriter writer)
         {
-            var ex = (Exception)exception;
+            var ex = FlattenException((Exception)exception);
             var type = ex.GetType();
 
             var indentedWriter = writer as IndentedTextWriter;
