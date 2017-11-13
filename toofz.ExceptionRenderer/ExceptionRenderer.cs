@@ -142,8 +142,9 @@ namespace toofz
                         }
                     }
 
-                    var regex = new Regex(@"<(\w+)>\w__\d+(?:`\d+)?\.MoveNext\(\)", RegexOptions.None, TimeSpan.FromSeconds(5));
-                    trimmedStackFrame = regex.Replace(trimmedStackFrame, "$1()");
+                    // Strip off compiler-generated types
+                    var regex = new Regex(@"(?:<>\w__DisplayClass\d+_\d+\.)?<?<(\w+)>\w__\d+(?:`\d+)?>?\w?(?:\.MoveNext)?", RegexOptions.None, TimeSpan.FromSeconds(5));
+                    trimmedStackFrame = regex.Replace(trimmedStackFrame, "$1");
 
                     indentedWriter.WriteLineStart(trimmedStackFrame);
                 }
