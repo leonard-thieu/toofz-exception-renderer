@@ -6,6 +6,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageVersion>1.1.2</PackageVersion>
     <Authors>Leonard Thieu</Authors>
     <Title>toofz Exception Renderer</Title>
