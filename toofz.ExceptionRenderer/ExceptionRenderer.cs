@@ -133,12 +133,30 @@ namespace toofz
                     if (trimmedStackFrame.StartsWith("System.Runtime.CompilerServices")) { continue; }
                     if (trimmedStackFrame.StartsWith("System.Runtime.ExceptionServices")) { continue; }
 
-                    if (suppressFileInfo)
+                    var inIndex = trimmedStackFrame.IndexOf(" in ");
+                    if (inIndex > -1)
                     {
-                        var inIndex = trimmedStackFrame.IndexOf(" in ");
-                        if (inIndex > -1)
+                        if (suppressFileInfo)
                         {
                             trimmedStackFrame = trimmedStackFrame.Remove(inIndex);
+                        }
+                        // Reduce noise for projects built on AppVeyor by stripping off the root build directory.
+                        else
+                        {
+                            var fileInfoIndex = inIndex + " in ".Length;
+                            var fileInfo = trimmedStackFrame.Substring(fileInfoIndex).Split(new[] { ":line " }, StringSplitOptions.None);
+                            var filePath = fileInfo[0];
+                            var lineNumber = fileInfo[1];
+                            // Probably built on AppVeyor
+                            if (filePath.StartsWith(@"C:\projects\"))
+                            {
+                                var solutionDirIndex = filePath.IndexOf('\\', @"C:\projects\".Length);
+                                if (solutionDirIndex > -1)
+                                {
+                                    trimmedStackFrame = trimmedStackFrame.Remove(fileInfoIndex) +
+                                        filePath.Substring(solutionDirIndex + 1) + ":line " + lineNumber;
+                                }
+                            }
                         }
                     }
 
