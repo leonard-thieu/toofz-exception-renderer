@@ -74,11 +74,10 @@ namespace toofz.Tests
                     var output = sr.ToString();
 
                     // Assert
-                    var expected = @"System.Exception was unhandled
+                    var expected = @"[System.Exception] Thrown test exception
   HResult=-2146233088
-  Message=Thrown test exception
   Source=toofz.ExceptionRenderer.Tests
-  StackTrace:
+  StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowException()
     toofz.Tests.ExceptionHelper.GetThrownException()";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
@@ -99,11 +98,10 @@ namespace toofz.Tests
                     var output = sr.ToString();
 
                     // Assert
-                    var expected = @"System.Exception was unhandled
+                    var expected = @"[System.Exception] Thrown test exception
   HResult=-2146233088
-  Message=Thrown test exception
   Source=toofz.ExceptionRenderer.Tests
-  StackTrace:
+  StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowException()
     toofz.Tests.ExceptionHelper.GetThrownException()";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
@@ -124,18 +122,16 @@ namespace toofz.Tests
                     var output = sr.ToString();
 
                     // Assert
-                    var expected = @"System.Exception was unhandled
+                    var expected = @"[System.Exception] Thrown test exception with inner exception
   HResult=-2146233088
-  Message=Thrown test exception with inner exception
   Source=toofz.ExceptionRenderer.Tests
-  StackTrace:
+  StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()
     toofz.Tests.ExceptionHelper.GetThrownExceptionWithInnerException()
-  InnerException: System.Exception
+  InnerException: [System.Exception] Thrown test exception
     HResult=-2146233088
-    Message=Thrown test exception
     Source=toofz.ExceptionRenderer.Tests
-    StackTrace:
+    StackTrace: 
       toofz.Tests.ExceptionHelper.ThrowException()
       toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
@@ -191,7 +187,7 @@ namespace toofz.Tests
 
                     // Assert
                     var expected = @"
-StackTrace:
+StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowException()
     toofz.Tests.ExceptionHelper.GetThrownException()";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
@@ -215,7 +211,7 @@ StackTrace:
 
                     // Assert
                     var expected = @"
-StackTrace:
+StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowException()
     toofz.TestsShared.Record.Exception(Action testCode)";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
@@ -237,7 +233,7 @@ StackTrace:
 
                     // Assert
                     Assert.Equal(@"
-StackTrace:
+StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowException()
     toofz.Tests.ExceptionHelper.GetThrownException()
     toofz.Tests.ExceptionHelper.ThrowsExceptionAsync()

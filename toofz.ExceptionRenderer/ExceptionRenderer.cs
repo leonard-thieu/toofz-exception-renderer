@@ -66,10 +66,10 @@ namespace toofz
             if (indentedWriter == null)
             {
                 indentedWriter = new IndentedTextWriter(writer, "  ");
-
-                indentedWriter.Write($"{type} was unhandled");
-                indentedWriter.Indent++;
             }
+
+            indentedWriter.Write($"[{type}] {ex.Message}");
+            indentedWriter.Indent++;
 
             var properties = type.GetProperties().OrderBy(x => x.Name);
             foreach (var property in properties)
@@ -83,6 +83,7 @@ namespace toofz
                     case nameof(Exception.TargetSite):
 
                     // Special case properties
+                    case nameof(Exception.Message):
                     case nameof(Exception.StackTrace):
                     case nameof(Exception.InnerException):
                         break;
@@ -103,9 +104,9 @@ namespace toofz
             var innerException = ex.InnerException;
             if (innerException != null)
             {
-                type = innerException.GetType();
-                indentedWriter.WriteLineStart($"{nameof(Exception.InnerException)}: {type}");
-                indentedWriter.Indent++;
+                indentedWriter.WriteLineStart($"{nameof(Exception.InnerException)}: ");
+                // Calling RendererMap.FindAndRender(object obj, TextWriter writer) ends up using the default Exception renderer
+                // instead of this one ¯\_(ツ)_/¯
                 RenderObject(rendererMap, innerException, indentedWriter);
             }
         }
@@ -120,7 +121,7 @@ namespace toofz
 
             if (stackFrames.Length == 0) { return; }
 
-            indentedWriter.WriteLineStart("StackTrace:");
+            indentedWriter.WriteLineStart($"{nameof(Exception.StackTrace)}: ");
             indentedWriter.Indent++;
 
             foreach (var stackFrame in stackFrames)
