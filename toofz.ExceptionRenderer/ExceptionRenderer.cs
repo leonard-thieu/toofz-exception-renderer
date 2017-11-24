@@ -143,8 +143,10 @@ namespace toofz
                     }
 
                     // Strip off compiler-generated types
-                    var regex = new Regex(@"(?:<>\w__DisplayClass\d+_\d+\.)?<?<(\w+)>\w__\d+(?:`\d+)?>?\w?(?:\.MoveNext)?", RegexOptions.None, TimeSpan.FromSeconds(5));
-                    trimmedStackFrame = regex.Replace(trimmedStackFrame, "$1");
+                    var displayClassRegex = new Regex(@"(?:<>\w__DisplayClass\d+_\d+(?:`\d+)?\.)", RegexOptions.None, TimeSpan.FromSeconds(5));
+                    trimmedStackFrame = displayClassRegex.Replace(trimmedStackFrame, "");
+                    var asyncRegex = new Regex(@"<?<(\w+)>\w__\d+(?:`\d+)?>?\w?(?:\.MoveNext)?", RegexOptions.None, TimeSpan.FromSeconds(5));
+                    trimmedStackFrame = asyncRegex.Replace(trimmedStackFrame, "$1");
 
                     indentedWriter.WriteLineStart(trimmedStackFrame);
                 }
