@@ -116,7 +116,7 @@ namespace toofz
         {
             stackTrace = stackTrace ?? "";
 
-            var stackFrames = stackTrace.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var stackFrames = stackTrace.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (stackFrames.Length == 0) { return; }
 
