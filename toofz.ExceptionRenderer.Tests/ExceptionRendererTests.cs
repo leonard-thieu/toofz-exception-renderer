@@ -1,5 +1,4 @@
-﻿using System;
-using System.CodeDom.Compiler;
+﻿using System.CodeDom.Compiler;
 using System.IO;
 using log4net;
 using log4net.ObjectRenderer;
@@ -10,80 +9,8 @@ namespace toofz.Tests
 {
     public class ExceptionRendererTests
     {
-        public class FlattenExceptionMethod
-        {
-            [Fact]
-            public void ExIsAggregateExceptionAndHasMultipleInnerExceptions_ReturnsFlattenedException()
-            {
-                // Arrange
-                var inner1 = new Exception();
-                var inner2 = new Exception();
-                var aggr = new AggregateException(inner1, inner2);
-
-                // Act
-                var ex = ExceptionRenderer.FlattenException(aggr);
-
-                // Assert
-                Assert.IsAssignableFrom<AggregateException>(ex);
-                var aggr2 = (AggregateException)ex;
-                Assert.True(aggr2.InnerExceptions.Count > 1);
-            }
-
-            [Fact]
-            public void ExIsAggregateException_ReturnsInnerException()
-            {
-                // Arrange
-                var inner = new Exception();
-                var aggr = new AggregateException(inner);
-
-                // Act
-                var ex = ExceptionRenderer.FlattenException(aggr);
-
-                // Assert
-                Assert.Same(inner, ex);
-            }
-
-            [Fact]
-            public void ExIsNotAggregateException_ReturnsEx()
-            {
-                // Arrange
-                var ex = new Exception();
-
-                // Act
-                var ex2 = ExceptionRenderer.FlattenException(ex);
-
-                // Assert
-                Assert.Same(ex, ex2);
-            }
-        }
-
         public class RenderObjectMethod
         {
-            [Fact]
-            public void AggregateException_RendersFlattenedException()
-            {
-                // Arrange
-                var rendererMap = new RendererMap();
-                var inner = ExceptionHelper.GetThrownException();
-                var ex = new AggregateException(inner);
-                var renderer = new ExceptionRenderer(null, suppressFileInfo: true);
-                using (var sr = new StringWriter())
-                {
-                    // Act
-                    renderer.RenderObject(rendererMap, ex, sr);
-                    var output = sr.ToString();
-
-                    // Assert
-                    var expected = @"[System.Exception] Thrown test exception
-  HResult=-2146233088
-  Source=toofz.ExceptionRenderer.Tests
-  StackTrace: 
-    toofz.Tests.ExceptionHelper.ThrowException()
-    toofz.Tests.ExceptionHelper.GetThrownException()";
-                    Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
-                }
-            }
-
             [Fact]
             public void RendersException()
             {

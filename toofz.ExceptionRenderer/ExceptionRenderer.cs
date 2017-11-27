@@ -15,20 +15,6 @@ namespace toofz
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ExceptionRenderer));
 
-        internal static Exception FlattenException(Exception ex)
-        {
-            var aggr = ex as AggregateException;
-            if (aggr != null)
-            {
-                var flattened = aggr.Flatten();
-                ex = flattened.InnerExceptions.Count == 1 ?
-                    flattened.InnerException :
-                    flattened;
-            }
-
-            return ex;
-        }
-
         /// <summary>
         /// Initializes an instance of the <see cref="ExceptionRenderer"/> class.
         /// </summary>
@@ -59,7 +45,7 @@ namespace toofz
         /// <param name="writer">The writer.</param>
         public void RenderObject(RendererMap rendererMap, object exception, TextWriter writer)
         {
-            var ex = FlattenException((Exception)exception);
+            var ex = (Exception)exception;
             var type = ex.GetType();
 
             var indentedWriter = writer as IndentedTextWriter;
