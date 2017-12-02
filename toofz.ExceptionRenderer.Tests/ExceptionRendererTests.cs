@@ -4,13 +4,23 @@ using log4net;
 using log4net.ObjectRenderer;
 using Moq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace toofz.Tests
 {
     public class ExceptionRendererTests
     {
-        public class RenderObjectMethod
+        public ExceptionRendererTests(ITestOutputHelper outputWriter)
         {
+            this.outputWriter = outputWriter;
+        }
+
+        private readonly ITestOutputHelper outputWriter;
+
+        public class RenderObjectMethod : ExceptionRendererTests
+        {
+            public RenderObjectMethod(ITestOutputHelper outputWriter) : base(outputWriter) { }
+
             [Fact]
             public void RendersException()
             {
@@ -23,10 +33,11 @@ namespace toofz.Tests
                     // Act
                     renderer.RenderObject(rendererMap, ex, sr);
                     var output = sr.ToString();
+                    outputWriter.WriteLine(output);
 
                     // Assert
                     var expected = @"[System.Exception] Thrown test exception
-  HResult=-2146233088
+  HResult=80131500
   Source=toofz.ExceptionRenderer.Tests
   StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowException()
@@ -47,16 +58,17 @@ namespace toofz.Tests
                     // Act
                     renderer.RenderObject(rendererMap, ex, sr);
                     var output = sr.ToString();
+                    outputWriter.WriteLine(output);
 
                     // Assert
                     var expected = @"[System.Exception] Thrown test exception with inner exception
-  HResult=-2146233088
+  HResult=80131500
   Source=toofz.ExceptionRenderer.Tests
   StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()
     toofz.Tests.ExceptionHelper.GetThrownExceptionWithInnerException()
   InnerException: [System.Exception] Thrown test exception
-    HResult=-2146233088
+    HResult=80131500
     Source=toofz.ExceptionRenderer.Tests
     StackTrace: 
       toofz.Tests.ExceptionHelper.ThrowException()
@@ -66,8 +78,10 @@ namespace toofz.Tests
             }
         }
 
-        public class RenderStackTraceMethod
+        public class RenderStackTraceMethod : ExceptionRendererTests
         {
+            public RenderStackTraceMethod(ITestOutputHelper outputWriter) : base(outputWriter) { }
+
             [Fact]
             public void StackTraceIsNull_DoesNotThrowNullReferenceException()
             {
@@ -93,9 +107,11 @@ namespace toofz.Tests
                 {
                     // Act
                     renderer.RenderStackTrace(stackTrace, indentedTextWriter);
+                    var output = sw.ToString();
+                    outputWriter.WriteLine(output);
 
                     // Assert
-                    Assert.Equal("", sw.ToString());
+                    Assert.Equal("", output);
                 }
             }
 
@@ -111,6 +127,7 @@ namespace toofz.Tests
                     // Act
                     renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
+                    outputWriter.WriteLine(output);
 
                     // Assert
                     var expected = @"
@@ -135,6 +152,7 @@ StackTrace:
                     // Act
                     renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
+                    outputWriter.WriteLine(output);
 
                     // Assert
                     var expected = @"
@@ -157,6 +175,7 @@ StackTrace:
                     // Act
                     renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
+                    outputWriter.WriteLine(output);
 
                     // Assert
                     Assert.Equal(@"
@@ -183,6 +202,7 @@ StackTrace:
                     // Act
                     renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
+                    outputWriter.WriteLine(output);
 
                     // Assert
                     mockLog.Verify(l => l.Warn(It.IsAny<object>()), Times.Never);
@@ -204,6 +224,7 @@ StackTrace:
                     // Act
                     renderer.RenderStackTrace(ex.StackTrace, indentedTextWriter);
                     var output = sw.ToString();
+                    outputWriter.WriteLine(output);
 
                     // Assert
                     mockLog.Verify(l => l.Warn(It.IsAny<object>()), Times.Once);
