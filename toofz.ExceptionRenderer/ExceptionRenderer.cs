@@ -74,6 +74,11 @@ namespace toofz
                     case nameof(Exception.InnerException):
                         break;
 
+                    case nameof(Exception.HResult):
+                        // Format as hex instead of decimal
+                        indentedWriter.WriteLineStart($"{name}={ex.HResult:X}");
+                        break;
+
                     default:
                         var value = property.GetValue(ex);
                         if (value != null)
