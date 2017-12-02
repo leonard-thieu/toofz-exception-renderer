@@ -7,6 +7,8 @@ branches:
 configuration:
   - Coverage
   - Release
+matrix:
+  fast_finish: true
 environment:
   PROJECT: toofz.ExceptionRenderer
   MYGET_API_KEY:
