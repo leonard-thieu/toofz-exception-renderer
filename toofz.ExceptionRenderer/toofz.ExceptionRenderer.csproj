@@ -8,7 +8,7 @@
   
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <PackageVersion>1.3.3</PackageVersion>
+    <PackageVersion>1.4.0</PackageVersion>
     <Authors>Leonard Thieu</Authors>
     <Title>toofz Exception Renderer</Title>
     <Description>An exception renderer for log4net that formats Exceptions for readability.</Description>
