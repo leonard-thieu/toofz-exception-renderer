@@ -76,7 +76,7 @@ namespace toofz
 
                     case nameof(Exception.HResult):
                         // Format as hex instead of decimal
-                        indentedWriter.WriteLineStart($"{name}={ex.HResult:X}");
+                        indentedWriter.WriteLineStart($"{name}=0x{ex.HResult:X}");
                         break;
 
                     default:

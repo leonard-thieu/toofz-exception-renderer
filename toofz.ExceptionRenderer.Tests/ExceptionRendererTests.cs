@@ -37,7 +37,7 @@ namespace toofz.Tests
 
                     // Assert
                     var expected = @"[System.Exception] Thrown test exception
-  HResult=80131500
+  HResult=0x80131500
   Source=toofz.ExceptionRenderer.Tests
   StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowException()
@@ -62,13 +62,13 @@ namespace toofz.Tests
 
                     // Assert
                     var expected = @"[System.Exception] Thrown test exception with inner exception
-  HResult=80131500
+  HResult=0x80131500
   Source=toofz.ExceptionRenderer.Tests
   StackTrace: 
     toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()
     toofz.Tests.ExceptionHelper.GetThrownExceptionWithInnerException()
   InnerException: [System.Exception] Thrown test exception
-    HResult=80131500
+    HResult=0x80131500
     Source=toofz.ExceptionRenderer.Tests
     StackTrace: 
       toofz.Tests.ExceptionHelper.ThrowException()
