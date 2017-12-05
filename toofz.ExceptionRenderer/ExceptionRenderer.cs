@@ -115,7 +115,7 @@ namespace toofz
             indentedWriter.WriteLineStart($"{nameof(Exception.StackTrace)}: ");
             indentedWriter.Indent++;
 
-            foreach (var stackFrame in stackFrames)
+            foreach (var stackFrame in stackFrames.Reverse())
             {
                 if (stackFrame.StartsWith("   at "))
                 {

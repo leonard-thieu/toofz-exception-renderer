@@ -40,8 +40,8 @@ namespace toofz.Tests
   HResult=0x80131500
   Source=toofz.ExceptionRenderer.Tests
   StackTrace: 
-    toofz.Tests.ExceptionHelper.ThrowException()
-    toofz.Tests.ExceptionHelper.GetThrownException()";
+    toofz.Tests.ExceptionHelper.GetThrownException()
+    toofz.Tests.ExceptionHelper.ThrowException()";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
                 }
             }
@@ -65,14 +65,14 @@ namespace toofz.Tests
   HResult=0x80131500
   Source=toofz.ExceptionRenderer.Tests
   StackTrace: 
-    toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()
     toofz.Tests.ExceptionHelper.GetThrownExceptionWithInnerException()
+    toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()
   InnerException: [System.Exception] Thrown test exception
     HResult=0x80131500
     Source=toofz.ExceptionRenderer.Tests
     StackTrace: 
-      toofz.Tests.ExceptionHelper.ThrowException()
-      toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()";
+      toofz.Tests.ExceptionHelper.ThrowExceptionWithInnerException()
+      toofz.Tests.ExceptionHelper.ThrowException()";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
                 }
             }
@@ -132,8 +132,8 @@ namespace toofz.Tests
                     // Assert
                     var expected = @"
 StackTrace: 
-    toofz.Tests.ExceptionHelper.ThrowException()
-    toofz.Tests.ExceptionHelper.GetThrownException()";
+    toofz.Tests.ExceptionHelper.GetThrownException()
+    toofz.Tests.ExceptionHelper.ThrowException()";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
                 }
             }
@@ -157,8 +157,8 @@ StackTrace:
                     // Assert
                     var expected = @"
 StackTrace: 
-    toofz.Tests.ExceptionHelper.ThrowException()
-    toofz.TestsShared.Record.Exception(Action testCode)";
+    toofz.TestsShared.Record.Exception(Action testCode)
+    toofz.Tests.ExceptionHelper.ThrowException()";
                     Assert.Equal(expected, output, ignoreLineEndingDifferences: true);
                 }
             }
@@ -180,10 +180,10 @@ StackTrace:
                     // Assert
                     Assert.Equal(@"
 StackTrace: 
-    toofz.Tests.ExceptionHelper.ThrowException()
-    toofz.Tests.ExceptionHelper.GetThrownException()
+    toofz.Tests.ExceptionHelper.GetThrownExceptionAsync()
     toofz.Tests.ExceptionHelper.ThrowsExceptionAsync()
-    toofz.Tests.ExceptionHelper.GetThrownExceptionAsync()", output, ignoreLineEndingDifferences: true);
+    toofz.Tests.ExceptionHelper.GetThrownException()
+    toofz.Tests.ExceptionHelper.ThrowException()", output, ignoreLineEndingDifferences: true);
                 }
             }
 
