@@ -2,6 +2,7 @@
 using System.CodeDom.Compiler;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using log4net;
 using log4net.ObjectRenderer;
@@ -73,14 +74,14 @@ namespace toofz
                     case nameof(Exception.InnerException):
                         break;
 
-                    case nameof(Exception.HResult):
-                        // Format as hex instead of decimal
-                        indentedWriter.WriteLineStart($"{name}=0x{ex.HResult:X}");
-                        break;
-
                     default:
                         var value = property.GetValue(ex);
-                        if (value != null)
+                        if ((name == nameof(Exception.HResult)) ||
+                            (ex is ExternalException && name == nameof(ExternalException.ErrorCode)))
+                        {
+                            indentedWriter.WriteLineStart($"{name}=0x{value:X}");
+                        }
+                        else if (value != null)
                         {
                             indentedWriter.WriteLineStart($"{name}=");
                             rendererMap.FindAndRender(value, indentedWriter);
