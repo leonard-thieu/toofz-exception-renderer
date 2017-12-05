@@ -57,8 +57,7 @@ namespace toofz
             indentedWriter.Write($"[{type}] {ex.Message}");
             indentedWriter.Indent++;
 
-            var properties = type.GetProperties().OrderBy(x => x.Name);
-            foreach (var property in properties)
+            foreach (var property in type.GetProperties().OrderBy(x => x.Name))
             {
                 var name = property.Name;
 
@@ -106,6 +105,11 @@ namespace toofz
             string stackTrace,
             IndentedTextWriter indentedWriter)
         {
+            const string StackFramePrefix = "   at ";
+            const string FileInfoPrefix = " in ";
+            const string FileInfoLinePrefix = ":line ";
+            const string AppVeyorCommonPath = @"C:\projects\";
+
             stackTrace = stackTrace ?? "";
 
             var stackFrames = stackTrace.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -117,42 +121,46 @@ namespace toofz
 
             foreach (var stackFrame in stackFrames.Reverse())
             {
-                if (stackFrame.StartsWith("   at "))
+                if (stackFrame.StartsWith(StackFramePrefix))
                 {
-                    var trimmedStackFrame = stackFrame.Substring(6);
+                    var trimmedStackFrame = stackFrame.Substring(StackFramePrefix.Length);
                     // Stack frames from the following namespaces are generally internals for handling async methods. 
                     // Filtering them out reduces noise when rendering stack traces.
                     if (trimmedStackFrame.StartsWith("System.Runtime.CompilerServices")) { continue; }
                     if (trimmedStackFrame.StartsWith("System.Runtime.ExceptionServices")) { continue; }
 
-                    var inIndex = trimmedStackFrame.IndexOf(" in ");
+                    var inIndex = trimmedStackFrame.IndexOf(FileInfoPrefix);
                     if (inIndex > -1)
                     {
+                        // Allows repeatable tests
                         if (suppressFileInfo)
                         {
                             trimmedStackFrame = trimmedStackFrame.Remove(inIndex);
                         }
-                        // Reduce noise for projects built on AppVeyor by stripping off the root build directory.
+                        // Reduce noise for projects built on AppVeyor by stripping off the build directory.
                         else
                         {
-                            var fileInfoIndex = inIndex + " in ".Length;
-                            var fileInfo = trimmedStackFrame.Substring(fileInfoIndex).Split(new[] { ":line " }, StringSplitOptions.None);
+                            var fileInfoIndex = inIndex + FileInfoPrefix.Length;
+                            var fileInfo = trimmedStackFrame.Substring(fileInfoIndex).Split(new[] { FileInfoLinePrefix }, StringSplitOptions.None);
                             var filePath = fileInfo[0];
                             var lineNumber = fileInfo[1];
                             // Probably built on AppVeyor
-                            if (filePath.StartsWith(@"C:\projects\"))
+                            if (filePath.StartsWith(AppVeyorCommonPath))
                             {
-                                var solutionDirIndex = filePath.IndexOf('\\', @"C:\projects\".Length);
+                                // Get the build directory.
+                                // C:\projects\toofz-exception-renderer\
+                                //                                     ^
+                                var solutionDirIndex = filePath.IndexOf('\\', AppVeyorCommonPath.Length);
                                 if (solutionDirIndex > -1)
                                 {
                                     trimmedStackFrame = trimmedStackFrame.Remove(fileInfoIndex) +
-                                        filePath.Substring(solutionDirIndex + 1) + ":line " + lineNumber;
+                                        filePath.Substring(solutionDirIndex + 1) + FileInfoLinePrefix + lineNumber;
                                 }
                             }
                         }
                     }
 
-                    // Strip off compiler-generated types
+                    // Strip off compiler-generated types and methods
                     var displayClassRegex = new Regex(@"(?:<>\w__DisplayClass\w+(?:_\d+)?(?:`\d+)?\.)", RegexOptions.None, TimeSpan.FromSeconds(5));
                     trimmedStackFrame = displayClassRegex.Replace(trimmedStackFrame, "");
                     var asyncRegex = new Regex(@"<?<(\w+)>\w__\d+(?:`\d+)?>?\w?(?:\.MoveNext)?", RegexOptions.None, TimeSpan.FromSeconds(5));
@@ -160,6 +168,7 @@ namespace toofz
 
                     indentedWriter.WriteLineStart(trimmedStackFrame);
                 }
+                // --- End of stack trace from previous location where exception was thrown ---
                 else if (stackFrame.StartsWith("---"))
                 {
                     continue;
