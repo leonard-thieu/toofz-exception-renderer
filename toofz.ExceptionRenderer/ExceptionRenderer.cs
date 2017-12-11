@@ -127,8 +127,8 @@ namespace toofz
                     var trimmedStackFrame = stackFrame.Substring(StackFramePrefix.Length);
                     // Stack frames from the following namespaces are generally internals for handling async methods. 
                     // Filtering them out reduces noise when rendering stack traces.
-                    if (trimmedStackFrame.StartsWith("System.Runtime.CompilerServices")) { continue; }
-                    if (trimmedStackFrame.StartsWith("System.Runtime.ExceptionServices")) { continue; }
+                    if (trimmedStackFrame.StartsWith(nameof(System.Runtime.CompilerServices))) { continue; }
+                    if (trimmedStackFrame.StartsWith(nameof(System.Runtime.ExceptionServices))) { continue; }
 
                     var inIndex = trimmedStackFrame.IndexOf(FileInfoPrefix);
                     if (inIndex > -1)
