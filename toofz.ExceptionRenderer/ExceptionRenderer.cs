@@ -3,7 +3,6 @@ using System.CodeDom.Compiler;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using log4net;
 using log4net.ObjectRenderer;
 
@@ -100,6 +99,8 @@ namespace toofz
                 // instead of this one ¯\_(ツ)_/¯
                 RenderObject(rendererMap, innerException, indentedWriter);
             }
+
+            indentedWriter.Indent--;
         }
 
         internal void RenderStackTrace(
@@ -107,9 +108,6 @@ namespace toofz
             IndentedTextWriter indentedWriter)
         {
             const string StackFramePrefix = "   at ";
-            const string FileInfoPrefix = " in ";
-            const string FileInfoLinePrefix = ":line ";
-            const string AppVeyorCommonPath = @"C:\projects\";
 
             stackTrace = stackTrace ?? "";
 
@@ -127,47 +125,12 @@ namespace toofz
                     var trimmedStackFrame = stackFrame.Substring(StackFramePrefix.Length);
                     // Stack frames from the following namespaces are generally internals for handling async methods. 
                     // Filtering them out reduces noise when rendering stack traces.
-                    if (trimmedStackFrame.StartsWith(nameof(System.Runtime.CompilerServices))) { continue; }
-                    if (trimmedStackFrame.StartsWith(nameof(System.Runtime.ExceptionServices))) { continue; }
+                    if (trimmedStackFrame.StartsWith("System.Runtime.CompilerServices")) { continue; }
+                    if (trimmedStackFrame.StartsWith("System.Runtime.ExceptionServices")) { continue; }
 
-                    var inIndex = trimmedStackFrame.IndexOf(FileInfoPrefix);
-                    if (inIndex > -1)
-                    {
-                        // Allows repeatable tests
-                        if (suppressFileInfo)
-                        {
-                            trimmedStackFrame = trimmedStackFrame.Remove(inIndex);
-                        }
-                        // Reduce noise for projects built on AppVeyor by stripping off the build directory.
-                        else
-                        {
-                            var fileInfoIndex = inIndex + FileInfoPrefix.Length;
-                            var fileInfo = trimmedStackFrame.Substring(fileInfoIndex).Split(new[] { FileInfoLinePrefix }, StringSplitOptions.None);
-                            var filePath = fileInfo[0];
-                            var lineNumber = fileInfo[1];
-                            // Probably built on AppVeyor
-                            if (filePath.StartsWith(AppVeyorCommonPath))
-                            {
-                                // Get the build directory.
-                                // C:\projects\toofz-exception-renderer\
-                                //                                     ^
-                                var solutionDirIndex = filePath.IndexOf('\\', AppVeyorCommonPath.Length);
-                                if (solutionDirIndex > -1)
-                                {
-                                    trimmedStackFrame = trimmedStackFrame.Remove(fileInfoIndex) +
-                                        filePath.Substring(solutionDirIndex + 1) + FileInfoLinePrefix + lineNumber;
-                                }
-                            }
-                        }
-                    }
+                    var esf = new ExceptionStackFrame(trimmedStackFrame);
 
-                    // Strip off compiler-generated types and methods
-                    var displayClassRegex = new Regex(@"(?:<>\w__DisplayClass\w+(?:_\d+)?(?:`\d+)?\.)", RegexOptions.None, TimeSpan.FromSeconds(5));
-                    trimmedStackFrame = displayClassRegex.Replace(trimmedStackFrame, "");
-                    var asyncRegex = new Regex(@"<?<(\w+)>\w__\d+(?:`\d+)?>?\w?(?:\.MoveNext)?", RegexOptions.None, TimeSpan.FromSeconds(5));
-                    trimmedStackFrame = asyncRegex.Replace(trimmedStackFrame, "$1");
-
-                    indentedWriter.WriteLineStart(trimmedStackFrame);
+                    indentedWriter.WriteLineStart(esf.ToString());
                 }
                 // --- End of stack trace from previous location where exception was thrown ---
                 else if (stackFrame.StartsWith("---"))
