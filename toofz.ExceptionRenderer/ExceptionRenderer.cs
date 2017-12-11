@@ -130,7 +130,7 @@ namespace toofz
 
                     var esf = new ExceptionStackFrame(trimmedStackFrame);
 
-                    indentedWriter.WriteLineStart(esf.ToString());
+                    indentedWriter.WriteLineStart(esf.ToString(suppressFileInfo));
                 }
                 // --- End of stack trace from previous location where exception was thrown ---
                 else if (stackFrame.StartsWith("---"))

@@ -78,20 +78,22 @@ namespace toofz
 
         public string ToString(bool suppressFileInfo)
         {
-            if (suppressFileInfo) { return ToString(); }
+            return suppressFileInfo ?
+                Method :
+                ToString();
+        }
 
-            var str = $"{ToString()}{FileInfoPrefix}";
+        public override string ToString()
+        {
+            if (FilePath == null) { return Method; }
+
+            var str = $"{Method}{FileInfoPrefix}{FilePath}";
             if (LineNumber > 0)
             {
                 str += $"{FileInfoLinePrefix}{LineNumber}";
             }
 
             return str;
-        }
-
-        public override string ToString()
-        {
-            return Method;
         }
     }
 }
