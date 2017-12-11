@@ -1,4 +1,5 @@
-﻿using System.CodeDom.Compiler;
+﻿using System;
+using System.CodeDom.Compiler;
 using System.IO;
 using log4net;
 using log4net.ObjectRenderer;
@@ -21,7 +22,7 @@ namespace toofz.Tests
         {
             public RenderObjectMethod(ITestOutputHelper outputWriter) : base(outputWriter) { }
 
-            [Fact]
+            [DisplayFact]
             public void RendersException()
             {
                 // Arrange
@@ -46,7 +47,7 @@ namespace toofz.Tests
                 }
             }
 
-            [Fact]
+            [DisplayFact]
             public void ExceptionHasInnerException_RendersExceptionRecursively()
             {
                 // Arrange
@@ -82,7 +83,7 @@ namespace toofz.Tests
         {
             public RenderStackTraceMethod(ITestOutputHelper outputWriter) : base(outputWriter) { }
 
-            [Fact]
+            [DisplayFact(nameof(NullReferenceException))]
             public void StackTraceIsNull_DoesNotThrowNullReferenceException()
             {
                 // Arrange
@@ -96,7 +97,7 @@ namespace toofz.Tests
                 }
             }
 
-            [Fact]
+            [DisplayFact]
             public void StackTraceIsEmpty_DoesNotRenderStackTrace()
             {
                 // Arrange
@@ -115,7 +116,7 @@ namespace toofz.Tests
                 }
             }
 
-            [Fact]
+            [DisplayFact]
             public void ThrownException_RendersStackTrace()
             {
                 // Arrange
@@ -138,7 +139,7 @@ StackTrace:
                 }
             }
 
-            [Fact]
+            [DisplayFact]
             public void UnthrownException_RendersStackTrace()
             {
                 // Arrange
@@ -163,7 +164,7 @@ StackTrace:
                 }
             }
 
-            [Fact]
+            [DisplayFact]
             public void RendersAsyncStackFrame()
             {
                 // Arrange
@@ -187,7 +188,7 @@ StackTrace:
                 }
             }
 
-            [Fact]
+            [DisplayFact]
             public void StackFrameStartsWith3Dashes_DoesNotLogWarning()
             {
                 // Arrange
@@ -209,7 +210,7 @@ StackTrace:
                 }
             }
 
-            [Fact]
+            [DisplayFact]
             public void StackFrameInWrongFormat_LogsWarning()
             {
                 // Arrange

@@ -8,7 +8,7 @@ namespace toofz.Tests
     {
         public class WriteLineStart
         {
-            [Fact]
+            [DisplayFact]
             public void WritesLineThenValue()
             {
                 // Arrange
