@@ -16,6 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\toofz.ExceptionRenderer\toofz.ExceptionRenderer.csproj" />
+    <ProjectReference Include="..\..\src\toofz.ExceptionRenderer\toofz.ExceptionRenderer.csproj" />
   </ItemGroup>
 </Project>

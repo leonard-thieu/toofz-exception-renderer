@@ -27,10 +27,10 @@ build:
 
 test_script:
   - ps: |
-      $projectPath = Resolve-Path .\toofz.ExceptionRenderer.Tests\toofz.ExceptionRenderer.Tests.csproj
+      $projectPath = Resolve-Path .\test\toofz.ExceptionRenderer.Tests\toofz.ExceptionRenderer.Tests.csproj
       msbuild $projectPath /nologo /verbosity:minimal /target:Test
 
 deploy_script:
   - ps: |
-      $projectPath = Resolve-Path .\toofz.ExceptionRenderer\toofz.ExceptionRenderer.csproj
+      $projectPath = Resolve-Path .\src\toofz.ExceptionRenderer\toofz.ExceptionRenderer.csproj
       msbuild $projectPath /nologo /verbosity:minimal /target:Pack /property:PublishPackage=$env:APPVEYOR_REPO_TAG

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EDD544BD-4CC2-4209-B2AF-0B1B4C4FDCED}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,9 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "toofz.ExceptionRenderer", "toofz.ExceptionRenderer\toofz.ExceptionRenderer.csproj", "{E145F268-5A9E-45A4-800C-CEC56935BDEF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4031BDF2-B60E-4D97-AD17-D85C99AC04CC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "toofz.ExceptionRenderer.Tests", "toofz.ExceptionRenderer.Tests\toofz.ExceptionRenderer.Tests.csproj", "{4883D46A-4F8E-4A8D-8A1D-3B6A640C90D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "toofz.ExceptionRenderer", "src\toofz.ExceptionRenderer\toofz.ExceptionRenderer.csproj", "{4168D6A5-5835-4643-A335-3EE60597961B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{184D91B4-8FDC-4DAE-9E01-0E3DBDCC3547}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "toofz.ExceptionRenderer.Tests", "test\toofz.ExceptionRenderer.Tests\toofz.ExceptionRenderer.Tests.csproj", "{B6AB9928-CC0F-4B62-BDD2-D47BF0927961}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,17 +24,21 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E145F268-5A9E-45A4-800C-CEC56935BDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E145F268-5A9E-45A4-800C-CEC56935BDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E145F268-5A9E-45A4-800C-CEC56935BDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E145F268-5A9E-45A4-800C-CEC56935BDEF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4883D46A-4F8E-4A8D-8A1D-3B6A640C90D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4883D46A-4F8E-4A8D-8A1D-3B6A640C90D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4883D46A-4F8E-4A8D-8A1D-3B6A640C90D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4883D46A-4F8E-4A8D-8A1D-3B6A640C90D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4168D6A5-5835-4643-A335-3EE60597961B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4168D6A5-5835-4643-A335-3EE60597961B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4168D6A5-5835-4643-A335-3EE60597961B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4168D6A5-5835-4643-A335-3EE60597961B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6AB9928-CC0F-4B62-BDD2-D47BF0927961}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6AB9928-CC0F-4B62-BDD2-D47BF0927961}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6AB9928-CC0F-4B62-BDD2-D47BF0927961}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6AB9928-CC0F-4B62-BDD2-D47BF0927961}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4168D6A5-5835-4643-A335-3EE60597961B} = {4031BDF2-B60E-4D97-AD17-D85C99AC04CC}
+		{B6AB9928-CC0F-4B62-BDD2-D47BF0927961} = {184D91B4-8FDC-4DAE-9E01-0E3DBDCC3547}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8984970F-1361-4931-9220-4F3D4835D39D}
